@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 
 /**
  * Properties for configuring toast appearance and behavior.
@@ -10,18 +10,18 @@ export type ToastProps = {
   onOpenChange?: (open: boolean) => void
   /** Visual variant of the toast */
   variant?: "default" | "destructive"
-}
+};
 
 /**
  * Action element to display in the toast (typically a button).
  */
-export type ToastActionElement = React.ReactElement
+export type ToastActionElement = React.ReactElement;
 
 /**
  * Maximum number of toasts to display simultaneously.
  * When limit is reached, oldest toasts are removed.
  */
-const TOAST_LIMIT = 1
+const TOAST_LIMIT = 1;
 
 /**
  * Delay in milliseconds before removing a dismissed toast from memory.
@@ -30,7 +30,7 @@ const TOAST_LIMIT = 1
  * Current value: 1000000ms (16.7 minutes) - likely for debugging.
  * Production value should typically be 3000-5000ms (3-5 seconds).
  */
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 1000000;
 
 /**
  * Complete toast object with all properties including generated ID.
@@ -45,16 +45,16 @@ export type ToasterToast = ToastProps & {
   description?: React.ReactNode
   /** Optional action button or element */
   action?: ToastActionElement
-}
+};
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",
   DISMISS_TOAST: "DISMISS_TOAST",
   REMOVE_TOAST: "REMOVE_TOAST",
-} as const
+} as const;
 
-let count = 0
+let count = 0;
 
 function genId() {
   count = (count + 1) % Number.MAX_SAFE_INTEGER
@@ -92,7 +92,7 @@ interface State {
  * Why global? Timeouts need to persist across component re-renders and
  * need to be accessible from the reducer for cleanup.
  */
-const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
+const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
 /**
  * Schedule a toast for removal after TOAST_REMOVE_DELAY.
@@ -104,19 +104,19 @@ const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
  */
 const addToRemoveQueue = (toastId: string) => {
   if (toastTimeouts.has(toastId)) {
-    return
+    return;
   }
 
   const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId)
+    toastTimeouts.delete(toastId);
     dispatch({
       type: "REMOVE_TOAST",
       toastId: toastId,
-    })
-  }, TOAST_REMOVE_DELAY)
+    });
+  }, TOAST_REMOVE_DELAY);
 
-  toastTimeouts.set(toastId, timeout)
-}
+  toastTimeouts.set(toastId, timeout);
+};
 
 /**
  * State reducer for toast management.
@@ -202,7 +202,7 @@ export const reducer = (state: State, action: Action): State => {
       }
     }
   }
-}
+};
 
 /**
  * Global listener registry.
@@ -211,7 +211,7 @@ export const reducer = (state: State, action: Action): State => {
  * Why array instead of Set? We need indexOf() for cleanup, and listeners
  * are added/removed infrequently (only on mount/unmount).
  */
-const listeners: Array<(state: State) => void> = []
+const listeners: Array<(state: State) => void> = [];
 
 /**
  * Global toast state stored outside React.
@@ -223,7 +223,7 @@ const listeners: Array<(state: State) => void> = []
  *
  * This pattern allows calling toast() from anywhere in the app.
  */
-let memoryState: State = { toasts: [] }
+let memoryState: State = { toasts: [] };
 
 /**
  * Dispatch an action to update global toast state.
@@ -240,7 +240,7 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = Omit<ToasterToast, "id">
+type Toast = Omit<ToasterToast, "id">;
 
 /**
  * Create and display a toast notification.
@@ -323,14 +323,14 @@ type Toast = Omit<ToasterToast, "id">
  * ```
  */
 function toast({ ...props }: Toast) {
-  const id = genId()
+  const id = genId();
 
   const update = (props: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
       toast: { ...props, id },
-    })
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
+    });
+  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
 
   dispatch({
     type: "ADD_TOAST",
@@ -342,13 +342,13 @@ function toast({ ...props }: Toast) {
         if (!open) dismiss()
       },
     },
-  })
+  });
 
   return {
     id: id,
     dismiss,
     update,
-  }
+  };
 }
 
 /**
@@ -442,7 +442,7 @@ function toast({ ...props }: Toast) {
  * ```
  */
 function useToast() {
-  const [state, setState] = React.useState<State>(memoryState)
+  const [state, setState] = React.useState<State>(memoryState);
 
   /**
    * Subscribe to global toast state changes.
@@ -463,13 +463,13 @@ function useToast() {
         listeners.splice(index, 1)
       }
     }
-  }, []) // ✓ FIXED: Removed [state] to prevent infinite re-subscription
+  }, []); // ✓ FIXED: Removed [state] to prevent infinite re-subscription
 
   return {
     ...state,
     toast,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
-  }
+  };
 }
 
 export { useToast, toast }

@@ -498,7 +498,7 @@ All hooks include comprehensive test suites with 98.25% coverage.
 ### Running Tests
 
 ```bash
-# Run all tests
+# Run all unit tests
 npm test
 
 # Run tests in watch mode
@@ -539,6 +539,100 @@ test('should throttle function calls', () => {
   expect(callback).toHaveBeenLastCalledWith('arg2')
 })
 ```
+
+---
+
+## 📖 Storybook
+
+Interactive documentation and examples for all hooks are available in Storybook.
+
+### Running Storybook
+
+```bash
+# Start Storybook development server
+npm run storybook
+
+# Build static Storybook
+npm run build-storybook
+```
+
+Storybook will start at `http://localhost:6006` where you can:
+
+- 🎨 **Explore interactive demos** - Try all hooks with live controls
+- 📚 **View documentation** - See comprehensive usage examples
+- 🎮 **Test edge cases** - Experiment with different configurations
+- 🔍 **Inspect source code** - View implementation details
+
+### Available Stories
+
+Each hook includes 3 interactive stories:
+
+**useContainerSize:**
+- BasicUsage - Interactive container resizing with slider
+- ResponsiveChart - SVG chart that adapts to container size
+
+**useDragResize:**
+- BasicResize - Simple resizable panel with handle
+- AspectRatioLocked - 16:9 video player mockup
+- GridSnapping - Visual grid with adjustable snap percentage
+
+**useThrottle:**
+- BasicUsage - Input field with call logging
+- ScrollThrottle - Scroll event reduction metrics
+- LeadingTrailingOptions - Configurable throttle behavior
+
+**useToast:**
+- BasicUsage - Success/error/action button toasts
+- UpdateToast - File upload progress simulation
+- ImperativeAPI - Global toast calls from anywhere
+
+---
+
+## 🎭 E2E Testing with Playwright
+
+End-to-end tests verify hook functionality through real browser interactions.
+
+### Running E2E Tests
+
+```bash
+# Run E2E tests (headless)
+npm run test:e2e
+
+# Run E2E tests with UI
+npm run test:e2e:ui
+
+# Run E2E tests in headed mode
+npm run test:e2e:headed
+```
+
+### Test Coverage
+
+E2E tests validate:
+
+- ✅ **Real user interactions** - Click, drag, scroll, type
+- ✅ **Visual rendering** - Element visibility and styling
+- ✅ **State updates** - Live dimension tracking, toast notifications
+- ✅ **Edge cases** - Grid snapping, aspect ratio locking, throttle limits
+- ✅ **Accessibility** - Keyboard navigation and ARIA attributes
+
+### Example E2E Test
+
+```typescript
+import { test, expect } from '@playwright/test'
+
+test('should show success toast when button clicked', async ({ page }) => {
+  await page.goto('/iframe.html?id=hooks-usetoast--basic-usage')
+
+  const successButton = page.locator('button:has-text("Show Success Toast")')
+  await successButton.click()
+
+  // Check for toast with success message
+  const toast = page.locator('text="Success!"')
+  await expect(toast).toBeVisible({ timeout: 5000 })
+})
+```
+
+**Total E2E Tests:** 30+ tests covering all hook interactions
 
 ---
 
